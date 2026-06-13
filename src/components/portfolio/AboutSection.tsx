@@ -1,8 +1,31 @@
+import React, { useState, useEffect } from "react";
 import { profile } from "@/data/portfolio";
 import { MapPin, Mail, Github, Linkedin, TerminalSquare } from "lucide-react";
 import HangingBulbsCanvas from "./HangingBulbsCanvas";
 
 const AboutSection = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    // Check screen size
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    // Check motion preferences
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(motionQuery.matches);
+    
+    const handleMotionChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    motionQuery.addEventListener("change", handleMotionChange);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      motionQuery.removeEventListener("change", handleMotionChange);
+    };
+  }, []);
+
   return (
     <section id="about" className="relative flex flex-col pt-16 pb-16 min-h-[100vh]">
       
@@ -12,10 +35,55 @@ const AboutSection = () => {
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent pointer-events-none z-10" />
       </div>
 
+      {/* Optimized Video Background for Text Block */}
+      <div className="absolute inset-0 top-[58vh] z-0 overflow-hidden pointer-events-none">
+        
+        {prefersReducedMotion ? (
+          // Fallback image for users who prefer reduced motion
+          <img
+            src="/jellyfish-poster.jpg"
+            alt="Jellyfish background"
+            className="absolute top-0 right-0 w-full md:w-[50%] lg:w-[40%] h-full object-cover opacity-40 mix-blend-screen"
+            style={{ 
+              maskImage: 'linear-gradient(to right, transparent, black 40%)',
+              WebkitMaskImage: '-webkit-linear-gradient(left, transparent, black 40%)'
+            }}
+          />
+        ) : (
+          // Optimized Video Element
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            preload="metadata"
+            poster="/jellyfish-poster.jpg"
+            // @ts-ignore - React doesn't officially type 'loading' for video yet, but it's requested
+            loading="lazy"
+            className="absolute top-0 right-0 w-full md:w-[50%] lg:w-[40%] h-full object-cover mix-blend-screen"
+            style={{ 
+              maskImage: 'linear-gradient(to right, transparent, black 40%)',
+              WebkitMaskImage: '-webkit-linear-gradient(left, transparent, black 40%)'
+            }}
+          >
+            {/* Conditional sources based on screen size for bandwidth optimization */}
+            <source
+              src={isMobile ? "/jellyfish-mobile.webm" : "/jellyfish-desktop.webm"}
+              type="video/webm"
+            />
+            {/* Fallback to original MP4 if webm isn't supported */}
+            <source src="/jelly.mp4" type="video/mp4" />
+          </video>
+        )}
+
+        {/* The requested blur overlay with red jellyfish theme gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-red-950/20 to-black/80 backdrop-blur-[2px]" />
+      </div>
+
       {/* Text Block Below Canvas */}
       <div className="max-w-5xl mx-auto px-6 relative z-20 w-full pt-8 flex-1 flex flex-col justify-center">
-        <div className="backdrop-blur-md bg-black/40 border border-border/50 rounded-2xl p-8 md:p-12 shadow-[0_0_40px_rgba(0,0,0,0.8)]">
-          <div className="flex flex-col gap-6 text-center md:text-left">
+        <div className="backdrop-blur-md bg-black/40 border border-white/5 hover:border-primary/20 transition-colors duration-500 rounded-2xl p-8 md:p-12 shadow-[0_0_40px_rgba(0,0,0,0.8)]">
+          <div className="flex flex-col gap-6 text-center md:text-left relative z-10">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight drop-shadow-lg">
               {profile.name}
             </h1>
@@ -33,18 +101,18 @@ const AboutSection = () => {
               {profile.bio}
             </p>
             
-            <div className="flex flex-wrap gap-6 justify-center md:justify-start mt-4 pt-6 border-t border-border/30">
+            <div className="flex flex-wrap gap-6 justify-center md:justify-start mt-4 pt-6 border-t border-white/10">
               <span className="flex items-center gap-2 text-muted-foreground font-mono text-sm">
                 <MapPin size={18} className="text-primary" /> {profile.location}
               </span>
-              <a href={`mailto:${profile.email}`} className="flex items-center gap-2 text-muted-foreground font-mono text-sm hover:text-primary transition-all hover:scale-105">
-                <Mail size={18} className="text-primary" /> Email Me
+              <a href={`mailto:${profile.email}`} className="group flex items-center gap-2 text-muted-foreground font-mono text-sm hover:text-primary transition-all">
+                <Mail size={18} className="text-primary group-hover:shadow-[0_0_10px_rgba(0,243,255,0.5)] rounded-full transition-all" /> Email Me
               </a>
-              <a href={profile.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground font-mono text-sm hover:text-primary transition-all hover:scale-105">
-                <Github size={18} className="text-primary" /> GitHub
+              <a href={profile.github} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-2 text-muted-foreground font-mono text-sm hover:text-primary transition-all">
+                <Github size={18} className="text-primary group-hover:shadow-[0_0_10px_rgba(0,243,255,0.5)] rounded-full transition-all" /> GitHub
               </a>
-              <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground font-mono text-sm hover:text-primary transition-all hover:scale-105">
-                <Linkedin size={18} className="text-primary" /> LinkedIn
+              <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-2 text-muted-foreground font-mono text-sm hover:text-primary transition-all">
+                <Linkedin size={18} className="text-primary group-hover:shadow-[0_0_10px_rgba(0,243,255,0.5)] rounded-full transition-all" /> LinkedIn
               </a>
             </div>
           </div>
