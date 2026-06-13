@@ -1,13 +1,10 @@
-# Welcome to your Lovable project
-
-TODO: Document your project here
-
-# Priyanshu Kushwaha — Dual-Mode Portfolio
+# Priyanshu Kushwaha - Dual-Mode Portfolio
 TODO: Document your project here
 A neumorphic portfolio website for a BCA student specializing in **Cloud Computing & Cybersecurity**. The site ships with two switchable experiences:
-1. **Normal Mode** — A soft, monochromatic neumorphic UI showcasing About, Skills, Projects, Education, and Contact.
-2. **Terminal Mode** — A fully interactive CLI with boot sequence, command history, tab autocomplete, scanline overlay, and Matrix easter egg.
-Live preview: <https://priyanshu-x.lovable.app>
+1. **Normal Mode** - A soft, monochromatic neumorphic UI showcasing About, Skills, Projects, Education, and Contact.
+2. **Terminal Mode** - A fully interactive CLI with boot sequence, command history, tab autocomplete, scanline overlay, and Matrix easter egg.
+
+Live preview: <https://priyanshu-x.verce.app>
 ---
 ## ✨ Features
 ### Design
@@ -81,35 +78,33 @@ npm run build
 # preview production build
 npm run preview
 ```
-The dev server starts on <http://localhost:8080>.
+The dev server starts on <http://localhost:8080>
 ---
 ## ✏️ Customizing Content
 All portfolio content lives in a single file: **`src/data/portfolio.ts`**.
 Update the exported objects to personalize the site:
-- `profile` — name, title, tagline, bio, email, social links
-- `education` — degrees, institutions, highlights
-- `skills` — `cloud`, `security`, `programming` (with proficiency %)
-- `projects` — title, description, tech stack, status
-- `certifications` — list of certs
-- `terminalCommands` — output for each CLI command
+- `profile` - name, title, tagline, bio, email, social links
+- `education` - degrees, institutions, highlights
+- `skills` - `cloud`, `security`, `programming` (with proficiency %)
+- `projects` - title, description, tech stack, status
+- `certifications` - list of certs
+- `terminalCommands` - output for each CLI command
 No other files need to change for content updates.
 ---
 ## 🎨 Design Tokens
 All colors are defined as HSL CSS variables in `src/index.css` and exposed
 through `tailwind.config.ts`. Use semantic classes (`bg-background`,
 `text-foreground`, `text-primary`, `neu-flat`, `neu-pressed`, `neu-button`,
-`text-terminal-fg`, etc.) — never hard-coded color values.
+`text-terminal-fg`, etc.) - never hard-coded color values.
 Key utility classes:
-- `.neu-flat` — extruded surface
-- `.neu-pressed` — inset/pressed surface
-- `.neu-button` — interactive press effect
-- `.scanline` — CRT scanline overlay
-- `.terminal-glow` — phosphor glow on terminal text
+- `.neu-flat` - extruded surface
+- `.neu-pressed` - inset/pressed surface
+- `.neu-button` - interactive press effect
+- `.scanline` - CRT scanline overlay
+- `.terminal-glow` - phosphor glow on terminal text
 ---
 ## 📦 Deployment
-This project is deployed via **Lovable**. To publish updates, open the
-project in Lovable and click **Publish**. Custom domains and SSL can be
-attached from the project settings.
+This project is deployed via **Vercel**. 
 ---
 ## 📄 License
 © 2025 Priyanshu Kushwaha. Built with React + TypeScript.
