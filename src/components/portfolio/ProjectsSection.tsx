@@ -1,9 +1,37 @@
+import { useState, useRef, useEffect } from "react";
 import { projects } from "@/data/portfolio";
 import { FolderGit2, ArrowUpRight } from "lucide-react";
 
 const ProjectsSection = () => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isMobile || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
   return (
-    <section id="projects" className="py-24 relative border-t border-white/5">
+    <section 
+      id="projects" 
+      className="py-24 relative border-t border-white/5" 
+      ref={containerRef} 
+      onMouseMove={handleMouseMove}
+      onMouseLeave={() => setHoveredIndex(null)}
+    >
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         
         <div className="mb-16 flex flex-col gap-2">
@@ -16,10 +44,31 @@ const ProjectsSection = () => {
           </h2>
         </div>
         
-        <div className="flex flex-col border-t border-white/10">
+        {/* Floating Image Preview overlay for desktop */}
+        {!isMobile && hoveredIndex !== null && projects[hoveredIndex]?.image && (
+          <div 
+            className="pointer-events-none absolute z-50 overflow-hidden rounded-lg border border-white/10 shadow-2xl transition-transform duration-200 ease-out"
+            style={{
+              width: '380px',
+              height: '240px',
+              transform: `translate(${mousePos.x + 20}px, ${mousePos.y + 20}px)`,
+              top: 0,
+              left: 0
+            }}
+          >
+            <img 
+              src={projects[hoveredIndex].image} 
+              alt="Project Preview" 
+              className="w-full h-full object-cover opacity-90 scale-105"
+            />
+          </div>
+        )}
+
+        <div className="flex flex-col border-t border-white/10 relative">
           {projects.map((project, i) => (
             <div
               key={project.title}
+              onMouseEnter={() => setHoveredIndex(i)}
               className="group relative border-b border-white/10 py-8 transition-colors hover:bg-white/[0.02] overflow-hidden"
             >
               {/* Subtle hover background sweep */}
@@ -50,17 +99,34 @@ const ProjectsSection = () => {
               {/* Accordion Expansion Content */}
               <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-in-out">
                 <div className="overflow-hidden">
-                  <div className="pt-8 flex flex-col md:flex-row gap-8 items-start opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                    <div className="flex-1">
+                  <div className="pt-8 flex flex-col lg:flex-row gap-8 items-start opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                    <div className="flex-1 flex flex-col gap-4">
                       <p className="text-muted-foreground leading-relaxed font-medium">
                         {project.description}
                       </p>
+                      
+                      {/* Mobile static image fallback */}
+                      {isMobile && project.image && (
+                        <div className="w-full h-48 rounded-lg overflow-hidden border border-white/10 mt-2">
+                          <img src={project.image} alt="Preview" className="w-full h-full object-cover opacity-80" />
+                        </div>
+                      )}
                     </div>
-                    <button className="shrink-0 flex items-center gap-2 text-sm font-mono text-primary border border-primary/30 px-4 py-2 rounded hover:bg-primary/10 transition-colors">
-                      <FolderGit2 size={16} />
-                      Access Files
-                      <ArrowUpRight size={16} />
-                    </button>
+                    
+                    <div className="shrink-0 flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                      {project.github && (
+                        <a href={project.github} target="_blank" rel="noopener noreferrer" className="flex justify-center items-center gap-2 text-sm font-mono text-foreground border border-white/20 px-4 py-2 rounded hover:bg-white/5 transition-colors">
+                          <FolderGit2 size={16} />
+                          Source Code
+                        </a>
+                      )}
+                      {project.link && (
+                        <a href={project.link} target="_blank" rel="noopener noreferrer" className="flex justify-center items-center gap-2 text-sm font-mono text-primary border border-primary/30 px-4 py-2 rounded hover:bg-primary/10 transition-colors">
+                          Access Live
+                          <ArrowUpRight size={16} />
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

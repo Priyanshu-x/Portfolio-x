@@ -21,7 +21,7 @@ const techStack = [
   { label: "Red Hat", name: "redhat", color: "#EE0000", size: 38 },
   { label: "Wireshark", name: "wireshark", color: "#1679A7", size: 28 },
   { label: "Metasploit", name: "metasploit", color: "#E83E3E", size: 38 },
-  { label: "Burp Suite", name: "portswigger", color: "#FF6633", size: 28 }, // Replaced Nmap
+  { label: "Burp Suite", name: "portswigger", color: "#FF6633", size: 28 },
   { label: "Python", name: "python", color: "#3572A5", size: 52 },
   { label: "MERN", name: "react", color: "#61DAFB", size: 52 },
   { label: "GCP", name: "googlecloud", color: "#4285F4", size: 38 },
@@ -52,6 +52,7 @@ const HangingBulbsCanvas = () => {
     let bulbs: Bulb[] = [];
     const gravity = 0.4;
     let isRunning = true;
+    let scrollProgress = 0;
     
     let mouse = { x: -1000, y: -1000, px: -1000, py: -1000, vx: 0, vy: 0 };
     
@@ -115,14 +116,10 @@ const HangingBulbsCanvas = () => {
         bulb.radius = techStack[i].size;
         
         let pivotX = spacing * (i + 1);
-        // Clamp pivot to prevent edge clipping at rest
         bulb.originX = Math.max(bulb.radius + 20, Math.min(canvas.width - bulb.radius - 20, pivotX));
         bulb.originY = -20;
         
-        // Ensure bulb glass never exits the bottom of the canvas
         const capH = bulb.radius * 0.6;
-        // Total lowest possible Y is: originY + length + capH + radius * 2
-        // We want this to be <= canvas.height - 10
         const maxAllowedLength = canvas.height - bulb.originY - capH - (bulb.radius * 2) - 10;
         
         const minLength = canvas.height * 0.15;
@@ -209,7 +206,6 @@ const HangingBulbsCanvas = () => {
         const size = r * 1.1; 
         ctx.drawImage(bulb.img, -size/2, bulbCenterY - size/2, size, size);
       } else {
-        // Safe fallback circle if image still failed
         ctx.beginPath();
         ctx.arc(0, bulbCenterY, r*0.3, 0, Math.PI*2);
         ctx.strokeStyle = bulb.color;
@@ -243,17 +239,14 @@ const HangingBulbsCanvas = () => {
           bulb.aVelocity *= bulb.damping;
           bulb.angle += bulb.aVelocity;
 
-          // Wall Repulsion Logic
           const r = bulb.radius;
           const capH = r * 0.6;
           const bulbCenterY = bulb.length + capH + r;
           const globalX = bulb.originX + Math.sin(bulb.angle) * bulbCenterY;
 
-          // If bulb hits left boundary
           if (globalX < r + 15) {
              bulb.aVelocity += 0.002;
           }
-          // If bulb hits right boundary
           if (globalX > canvas.width - r - 15) {
              bulb.aVelocity -= 0.002;
           }
@@ -270,6 +263,20 @@ const HangingBulbsCanvas = () => {
       updatePhysics();
       bulbs.forEach(drawBulb);
       
+      // Scroll Indicator
+      if (scrollProgress <= 0.1) {
+        const pulseOpacity = 0.2 + (Math.sin(Date.now() / 300) * 0.5 + 0.5) * 0.4; // sine wave between 0.2 and 0.6
+        const fadeOut = 1 - (scrollProgress / 0.1); // fades completely by 0.1 progress
+        const finalOpacity = pulseOpacity * fadeOut;
+        
+        ctx.save();
+        ctx.fillStyle = `rgba(0, 243, 255, ${finalOpacity})`;
+        ctx.font = '13px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('>_ scroll', canvas.width / 2, canvas.height - 30);
+        ctx.restore();
+      }
+      
       if (isRunning) {
         animationFrameId = requestAnimationFrame(render);
       }
@@ -282,17 +289,68 @@ const HangingBulbsCanvas = () => {
       mouse.y = e.clientY - rect.top;
     };
     
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = e.touches[0].clientX - rect.left;
+        mouse.y = e.touches[0].clientY - rect.top;
+      }
+    };
+    
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const rect = canvas.getBoundingClientRect();
+        const tx = e.touches[0].clientX - rect.left;
+        const ty = e.touches[0].clientY - rect.top;
+        
+        // Apply tap force
+        bulbs.forEach(bulb => {
+          const r = bulb.radius;
+          const capH = r * 0.6;
+          const bulbCenterY = bulb.length + capH + r;
+          const globalX = bulb.originX + Math.sin(bulb.angle) * bulbCenterY;
+          const globalY = bulb.originY + Math.cos(bulb.angle) * bulbCenterY;
+          const dx = tx - globalX;
+          const dy = ty - globalY;
+          if (Math.sqrt(dx*dx + dy*dy) < r * 2.5) {
+            bulb.aVelocity += (tx > globalX ? -0.015 : 0.015);
+          }
+        });
+        
+        mouse.px = tx;
+        mouse.py = ty;
+        mouse.x = tx;
+        mouse.y = ty;
+      }
+    };
+    
+    const handleScroll = () => {
+      // Calculate scroll progress (0 to 1 over the first 100vh)
+      scrollProgress = Math.min(window.scrollY / window.innerHeight, 1);
+      // Dim canvas to 25% opacity max
+      canvas.style.opacity = String(1 - (scrollProgress * 0.75));
+    };
+
     loadImages().then(() => {
       render();
     });
 
     window.addEventListener("resize", handleResize);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     canvas.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: true });
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: true });
+    
+    // Initial scroll check in case page is reloaded halfway down
+    handleScroll();
 
     return () => {
       isRunning = false;
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", handleScroll);
       canvas.removeEventListener("mousemove", handleMouseMove);
+      canvas.removeEventListener("touchstart", handleTouchStart);
+      canvas.removeEventListener("touchmove", handleTouchMove);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
@@ -300,7 +358,7 @@ const HangingBulbsCanvas = () => {
   return (
     <canvas 
       ref={canvasRef} 
-      className="w-full h-full absolute top-0 left-0 z-0 pointer-events-auto"
+      className="w-full h-full absolute top-0 left-0 pointer-events-auto transition-opacity duration-75"
       style={{ background: 'transparent' }}
     />
   );

@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { profile } from "@/data/portfolio";
-import { Mail, Github, Linkedin, MapPin, Radio } from "lucide-react";
+import { Mail, Github, Linkedin, MapPin, Radio, Send, Loader2, CheckCircle2, XCircle } from "lucide-react";
 
 const ContactItem = ({
   icon: Icon,
@@ -45,6 +46,37 @@ const ContactItem = ({
 };
 
 const ContactSection = () => {
+  const [formStatus, setFormStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormStatus("loading");
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const formspreeId = import.meta.env.VITE_FORMSPREE_ID;
+      const response = await fetch(`https://formspree.io/f/${formspreeId}`, {
+        method: "POST",
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (response.ok) {
+        setFormStatus("success");
+        form.reset();
+        setTimeout(() => setFormStatus("idle"), 5000);
+      } else {
+        setFormStatus("error");
+        setTimeout(() => setFormStatus("idle"), 5000);
+      }
+    } catch (err) {
+      setFormStatus("error");
+      setTimeout(() => setFormStatus("idle"), 5000);
+    }
+  };
+
   return (
     <section id="contact" className="py-24 relative border-t border-white/5">
       <div className="max-w-4xl mx-auto px-6 relative z-10">
@@ -74,15 +106,46 @@ const ContactSection = () => {
           <ContactItem icon={Linkedin} label="LinkedIn Network" value="linkedin.com/in/priyanshu-x" href={profile.linkedin} delay={400} />
         </div>
 
-        {/* Decorative terminal input */}
-        <div className="max-w-2xl mx-auto mt-12 p-4 rounded-lg bg-black/50 border border-white/5 font-mono text-sm text-muted-foreground flex items-center justify-between group cursor-text transition-colors hover:border-primary/30">
-          <div className="flex items-center gap-2">
-            <span className="text-primary">&gt;</span>
-            <span className="opacity-50">Type your message...</span>
-            <span className="w-1.5 h-4 bg-primary animate-pulse" />
+        {/* Working terminal-style form */}
+        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto mt-12 flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <input
+              type="email"
+              name="email"
+              required
+              placeholder="visitor@email.com"
+              className="flex-1 p-4 rounded-lg bg-black/50 border border-white/5 font-mono text-sm text-foreground focus:outline-none focus:border-primary/50 focus:shadow-[0_0_15px_rgba(0,243,255,0.1)] transition-all"
+            />
           </div>
-          <span className="text-[10px] uppercase tracking-widest opacity-30 group-hover:opacity-100 transition-opacity">Press Enter</span>
-        </div>
+          <div className="relative">
+            <textarea
+              name="message"
+              required
+              rows={3}
+              placeholder="> Type your message..."
+              className="w-full p-4 rounded-lg bg-black/50 border border-white/5 font-mono text-sm text-foreground focus:outline-none focus:border-primary/50 focus:shadow-[0_0_15px_rgba(0,243,255,0.1)] transition-all resize-none"
+            />
+            <button
+              type="submit"
+              disabled={formStatus === "loading" || formStatus === "success"}
+              className="absolute bottom-4 right-4 text-primary bg-primary/10 hover:bg-primary/20 border border-primary/30 p-2 rounded transition-colors disabled:opacity-50 flex items-center justify-center"
+            >
+              {formStatus === "loading" ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+            </button>
+          </div>
+
+          {/* Terminal Response Line */}
+          {formStatus === "success" && (
+            <div className="flex items-center gap-2 text-green-400 font-mono text-xs animate-fade-in">
+              <CheckCircle2 size={14} /> <span>&gt; transmission successful. secure link established.</span>
+            </div>
+          )}
+          {formStatus === "error" && (
+            <div className="flex items-center gap-2 text-red-400 font-mono text-xs animate-fade-in">
+              <XCircle size={14} /> <span>&gt; transmission failed. please check connection.</span>
+            </div>
+          )}
+        </form>
 
       </div>
     </section>

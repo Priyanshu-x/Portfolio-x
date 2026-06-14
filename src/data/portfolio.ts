@@ -57,6 +57,9 @@ export const projects = [
       "A Flask-based public file board for uploading, sharing, and managing files with automatic file expiry and admin controls.",
     tech: ["Flask", "Python", "SQLite/MySQL", "Bootstrap"],
     status: "Completed",
+    image: "/file-board.png",
+    link: "https://file-board.onrender.com/",
+    github: "https://github.com/Priyanshu-x/file-board"
   },
   {
     title: "FocusLock",
@@ -64,6 +67,9 @@ export const projects = [
       "An Android productivity application that locks the device and blocks access to distracting apps until the timer completes.",
     tech: ["Android", "Kotlin/Java"],
     status: "Completed",
+    image: "/focus-lock.png",
+    link: "https://github.com/Priyanshu-x/focuslock",
+    github: "https://github.com/Priyanshu-x/focuslock"
   },
   {
     title: "Chattr",
@@ -71,6 +77,9 @@ export const projects = [
       "A modern real-time chat application with a sleek UI/UX and a distinctive C-shaped Pac-Man logo.",
     tech: ["React", "Node.js", "Socket.IO", "MongoDB"],
     status: "Completed",
+    image: "/chattr.png",
+    link: "https://chattr-x.onrender.com/",
+    github: "https://github.com/Priyanshu-x/Chattr"
   },
 ];
 
