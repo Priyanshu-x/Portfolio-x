@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { profile } from "@/data/portfolio";
-import { MapPin, Mail, Github, Linkedin, TerminalSquare } from "lucide-react";
+import { MapPin, Mail, Github, Linkedin, TerminalSquare, X, Shield, Code } from "lucide-react";
 import HangingBulbsCanvas from "./HangingBulbsCanvas";
 
 const AboutSection = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [showResumeModal, setShowResumeModal] = useState(false);
 
   useEffect(() => {
     // Check screen size
@@ -121,15 +123,70 @@ const AboutSection = () => {
                 <a href="#projects" className="px-6 py-2.5 rounded bg-primary/10 text-primary border border-primary/30 font-mono text-sm hover:bg-primary/20 hover:shadow-[0_0_15px_rgba(0,243,255,0.4)] transition-all flex items-center gap-2">
                   View Projects <span className="font-sans">→</span>
                 </a>
-                <a href="/resume.pdf" download className="px-6 py-2.5 rounded bg-white/5 text-foreground border border-white/10 font-mono text-sm hover:bg-white/10 transition-all flex items-center gap-2">
+                <button 
+                  onClick={() => setShowResumeModal(true)}
+                  className="px-6 py-2.5 rounded bg-white/5 text-foreground border border-white/10 font-mono text-sm hover:bg-white/10 transition-all flex items-center gap-2"
+                >
                   Download Resume <span className="font-sans">↓</span>
-                </a>
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
       
+      {/* Resume Selection Modal via Portal */}
+      {showResumeModal && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#0a0a0a] border border-primary/30 rounded-xl max-w-md w-full p-6 shadow-[0_0_50px_rgba(0,243,255,0.15)] relative">
+            <button 
+              onClick={() => setShowResumeModal(false)}
+              className="absolute top-4 right-4 text-muted-foreground hover:text-primary transition-colors"
+            >
+              <X size={20} />
+            </button>
+            
+            <div className="mb-8">
+              <h3 className="text-2xl font-bold text-foreground font-mono mb-2">Select Resume</h3>
+              <p className="text-muted-foreground text-sm">Please select the resume version that aligns with the role you are hiring for.</p>
+            </div>
+            
+            <div className="flex flex-col gap-4">
+              <a 
+                href="/Resume Cyber.pdf" 
+                download 
+                onClick={() => setShowResumeModal(false)}
+                className="group flex items-center p-4 rounded-lg border border-white/10 bg-white/5 hover:border-primary/50 hover:bg-primary/5 transition-all"
+              >
+                <div className="h-10 w-10 rounded bg-primary/10 text-primary flex items-center justify-center mr-4 group-hover:shadow-[0_0_15px_rgba(0,243,255,0.3)] transition-all">
+                  <Shield size={20} />
+                </div>
+                <div>
+                  <h4 className="text-foreground font-semibold font-mono text-sm mb-1">Cybersecurity</h4>
+                  <p className="text-xs text-muted-foreground">Network security, pentesting, and cloud infrastructure.</p>
+                </div>
+              </a>
+              
+              <a 
+                href="/Resume FSD.pdf" 
+                download 
+                onClick={() => setShowResumeModal(false)}
+                className="group flex items-center p-4 rounded-lg border border-white/10 bg-white/5 hover:border-primary/50 hover:bg-primary/5 transition-all"
+              >
+                <div className="h-10 w-10 rounded bg-primary/10 text-primary flex items-center justify-center mr-4 group-hover:shadow-[0_0_15px_rgba(0,243,255,0.3)] transition-all">
+                  <Code size={20} />
+                </div>
+                <div>
+                  <h4 className="text-foreground font-semibold font-mono text-sm mb-1">Full-Stack Development</h4>
+                  <p className="text-xs text-muted-foreground">React, Node.js, databases, and web applications.</p>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
       {/* Typewriter CSS inline for simplicity */}
       <style>{`
         .typewriter-effect {
