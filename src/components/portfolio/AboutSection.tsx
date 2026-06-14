@@ -29,7 +29,7 @@ const AboutSection = () => {
   }, []);
 
   return (
-    <section id="about" className="relative flex flex-col h-[200vh] overflow-hidden">
+    <section className="relative flex flex-col h-[200vh] overflow-hidden">
       
       {/* Sticky Canvas Container */}
       <div className="w-full sticky top-0 h-[100vh] z-[1]">
@@ -39,6 +39,7 @@ const AboutSection = () => {
 
       {/* Intro Card - Sits in normal flow, scrolls over the canvas */}
       <div 
+        id="about"
         className="relative z-[2] w-full pt-12 flex-1 flex flex-col"
         style={{
           background: 'linear-gradient(180deg, transparent 0%, #0a0a0a 60px, #0a0a0a 100%)',
