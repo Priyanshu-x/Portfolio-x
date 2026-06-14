@@ -58,6 +58,7 @@ export const projects = [
     tech: ["Flask", "Python", "SQLite/MySQL", "Bootstrap"],
     status: "Completed",
     image: "/file-board.png",
+    imageOrientation: "landscape",
     link: "https://file-board.onrender.com/",
     github: "https://github.com/Priyanshu-x/file-board"
   },
@@ -68,6 +69,7 @@ export const projects = [
     tech: ["Android", "Kotlin/Java"],
     status: "Completed",
     image: "/focus-lock.png",
+    imageOrientation: "portrait",
     link: "https://github.com/Priyanshu-x/focuslock",
     github: "https://github.com/Priyanshu-x/focuslock"
   },
@@ -78,6 +80,7 @@ export const projects = [
     tech: ["React", "Node.js", "Socket.IO", "MongoDB"],
     status: "Completed",
     image: "/chattr.png",
+    imageOrientation: "landscape",
     link: "https://chattr-x.onrender.com/",
     github: "https://github.com/Priyanshu-x/Chattr"
   },

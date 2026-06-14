@@ -49,8 +49,8 @@ const ProjectsSection = () => {
           <div 
             className="pointer-events-none absolute z-50 overflow-hidden rounded-lg border border-white/10 shadow-2xl transition-transform duration-200 ease-out"
             style={{
-              width: '380px',
-              height: '240px',
+              width: (projects[hoveredIndex] as any).imageOrientation === "portrait" ? '220px' : '380px',
+              height: (projects[hoveredIndex] as any).imageOrientation === "portrait" ? '440px' : '240px',
               transform: `translate(${mousePos.x + 20}px, ${mousePos.y + 20}px)`,
               top: 0,
               left: 0
@@ -59,7 +59,7 @@ const ProjectsSection = () => {
             <img 
               src={projects[hoveredIndex].image} 
               alt="Project Preview" 
-              className="w-full h-full object-cover opacity-90 scale-105"
+              className="w-full h-full object-cover opacity-90"
             />
           </div>
         )}
