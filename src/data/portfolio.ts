@@ -52,6 +52,17 @@ export const skills = {
 
 export const projects = [
   {
+    title: "Kaizen",
+    description:
+      "A specialized, monochrome web application designed exclusively for tracking trading profit, losses and performance metrics.",
+    tech: ["React", "Vite", "Tailwind CSS", "Firebase", "Node.js", "Express", "MongoDB"],
+    status: "Completed",
+    image: "/kaizen.png",
+    imageOrientation: "landscape",
+    link: "https://kaizen-log.vercel.app/",
+    github: "https://github.com/Priyanshu-x/kaizen"
+  },
+  {
     title: "File-Board",
     description:
       "A Flask-based public file board for uploading, sharing, and managing files with automatic file expiry and admin controls.",
